@@ -10,7 +10,7 @@ class Pjt11 {
     }
 
     private void run() {
-        System.out.println("===== Simple Checkout System =====\n");
+        System.out.println("====== Simple Checkout System ======\n");
 
         String name = promptRequired("Name");
 
