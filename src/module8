@@ -15,7 +15,6 @@ class OrderConfirmation {
         System.out.println("You will receive updates on your registered mobile.");
         System.out.println("934*****89");
 
-        // Simple email simulation
         System.out.println("\n[Email Simulation] Confirmation mail sent to customer@email.com");
     }
 
