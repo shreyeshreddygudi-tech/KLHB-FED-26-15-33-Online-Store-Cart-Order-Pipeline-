@@ -50,7 +50,7 @@ class FrontendUI {
         System.out.println("Phone   : _______________");
         System.out.println("City    : _______________");
         System.out.println("Pincode : _______________");
-        System.out.println("===================================");
+        System.out.println("====================================");
     }
 
     static void orderSuccessPage(String orderId) {
