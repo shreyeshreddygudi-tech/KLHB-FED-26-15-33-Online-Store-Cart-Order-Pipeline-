@@ -21,6 +21,7 @@ class Checkout {
         System.out.print("Phone: ");
         phone = sc.nextLine();
 
+
         System.out.print("City: ");
         city = sc.nextLine();
 
