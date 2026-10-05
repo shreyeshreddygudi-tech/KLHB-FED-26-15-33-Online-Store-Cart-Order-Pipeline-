@@ -13,9 +13,8 @@ class User {
 class UserSession {
     static User[] users = new User[10];
     static int userCount = 0;
-    static String currentUser = null;   // session
+    static String currentUser = null;
 
-    // Register
     static void register(String uname, String pass) {
         if (userCount < users.length) {
             users[userCount] = new User(uname, pass);
@@ -26,7 +25,7 @@ class UserSession {
         }
     }
 
-    // Login
+
     static boolean login(String uname, String pass) {
         for (int i = 0; i < userCount; i++) {
             if (users[i].username.equals(uname) && users[i].password.equals(pass)) {
@@ -39,19 +38,19 @@ class UserSession {
         return false;
     }
 
-    // Guest mode
+
     static void guestLogin() {
         currentUser = "Guest";
         System.out.println("Continuing as Guest.");
     }
 
-    // Logout
+ 
     static void logout() {
         currentUser = null;
         System.out.println("Logged out.");
     }
 
-    // Check session
+
     static void showSession() {
         if (currentUser == null) {
             System.out.println("No active session.");
