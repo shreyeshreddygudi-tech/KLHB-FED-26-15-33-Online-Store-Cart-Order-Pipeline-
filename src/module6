@@ -36,7 +36,7 @@ class Order {
         this.address = address;
     }
 
-    // Generate unique order ID
+
     static String generateOrderId() {
         Random rand = new Random();
         int num = 10000 + rand.nextInt(90000);
