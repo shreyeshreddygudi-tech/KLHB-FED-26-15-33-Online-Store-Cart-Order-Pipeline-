@@ -1,12 +1,11 @@
 class DataStorage {
-    // In-memory storage using simple arrays (no ArrayList)
+
     static String[] productData = new String[50];
     static int productCount = 0;
 
     static String[] orderData = new String[50];
     static int orderCount = 0;
 
-    // Save product
     static void saveProduct(String data) {
         if (productCount < productData.length) {
             productData[productCount] = data;
@@ -17,7 +16,6 @@ class DataStorage {
         }
     }
 
-    // Load products
     static void loadProducts() {
         System.out.println("\n===== Loaded Products =====");
         if (productCount == 0) {
@@ -29,7 +27,6 @@ class DataStorage {
         }
     }
 
-    // Save order
     static void saveOrder(String data) {
         if (orderCount < orderData.length) {
             orderData[orderCount] = data;
@@ -40,7 +37,6 @@ class DataStorage {
         }
     }
 
-    // Load orders
     static void loadOrders() {
         System.out.println("\n===== Loaded Orders =====");
         if (orderCount == 0) {
@@ -52,7 +48,7 @@ class DataStorage {
         }
     }
 
-    // Simple "file" simulation (just print)
+
     static void saveToFile(String filename, String content) {
         System.out.println("[File Simulation] Writing to " + filename + ":");
         System.out.println(content);
