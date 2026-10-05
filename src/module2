@@ -22,9 +22,9 @@ class ShoppingCart {
     static CartItem[] cart = new CartItem[20];  // max 20 items
     static int itemCount = 0;
 
-    // Add item to cart
+
     static void addItem(int productId, String name, double price, int qty) {
-        // Check if already exists
+
         for (int i = 0; i < itemCount; i++) {
             if (cart[i].productId == productId) {
                 cart[i].quantity += qty;
@@ -32,7 +32,7 @@ class ShoppingCart {
                 return;
             }
         }
-        // New item
+
         if (itemCount < cart.length) {
             cart[itemCount] = new CartItem(productId, name, price, qty);
             itemCount++;
@@ -42,11 +42,10 @@ class ShoppingCart {
         }
     }
 
-    // Remove item
+
     static void removeItem(int productId) {
         for (int i = 0; i < itemCount; i++) {
             if (cart[i].productId == productId) {
-                // Shift remaining items
                 for (int j = i; j < itemCount - 1; j++) {
                     cart[j] = cart[j + 1];
                 }
@@ -58,7 +57,6 @@ class ShoppingCart {
         System.out.println("Item not found in cart.");
     }
 
-    // Update quantity
     static void updateQuantity(int productId, int newQty) {
         for (int i = 0; i < itemCount; i++) {
             if (cart[i].productId == productId) {
@@ -74,7 +72,7 @@ class ShoppingCart {
         System.out.println("Item not found.");
     }
 
-    // Calculate total
+ 
     static double calculateTotal() {
         double total = 0;
         for (int i = 0; i < itemCount; i++) {
@@ -83,13 +81,13 @@ class ShoppingCart {
         return total;
     }
 
-    // Clear cart
+    
     static void clearCart() {
         itemCount = 0;
         System.out.println("Cart cleared.");
     }
 
-    // Display cart
+    
     static void displayCart() {
         if (itemCount == 0) {
             System.out.println("Cart is empty.");
