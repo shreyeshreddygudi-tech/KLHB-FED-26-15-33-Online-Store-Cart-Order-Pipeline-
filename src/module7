@@ -4,11 +4,11 @@ import java.util.Scanner;
 class Payment {
     static String[] methods = {"Card", "COD", "UPI"};
 
-    // Mock payment
+
     static boolean processPayment(String method, double amount) {
         System.out.println("\nProcessing payment of Rs." + amount + " via " + method + "...");
 
-        // Simulate delay
+
         try {
             Thread.sleep(1000);
         } catch (Exception e) {}
@@ -16,7 +16,7 @@ class Payment {
         Random rand = new Random();
         int chance = rand.nextInt(10);  // 0-9
 
-        // 80% success chance
+   
         if (chance < 8) {
             System.out.println("Payment SUCCESSFUL!");
             return true;
