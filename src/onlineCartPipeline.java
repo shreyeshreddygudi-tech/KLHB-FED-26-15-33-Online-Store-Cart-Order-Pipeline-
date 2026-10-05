@@ -25,7 +25,7 @@ class Product {
         System.out.println("ID: " + id + " | " + name + " | " + Utility.formatPrice(price) + " | Stock: " + stock);
         System.out.println("Desc : " + description);
         System.out.println("Image: " + image);
-        System.out.println("--------------------------------");
+        System.out.println("---------------------------------");
     }
 }
 
