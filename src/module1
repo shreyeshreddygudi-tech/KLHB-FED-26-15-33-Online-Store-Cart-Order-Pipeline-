@@ -5,10 +5,9 @@ class Product {
     String name;
     double price;
     String description;
-    String image;      // just a string for simplicity
+    String image;      
     int stock;
 
-    // Constructor
     Product(int id, String name, double price, String description, String image, int stock) {
         this.id = id;
         this.name = name;
@@ -30,7 +29,7 @@ class ProductCatalog {
     static Product[] products = new Product[5];  // fixed array for basic version
     static int count = 0;
 
-    // Add sample products
+  
     static void loadProducts() {
         products[0] = new Product(101, "Laptop", 45000, "15-inch gaming laptop", "laptop.jpg", 10);
         products[1] = new Product(102, "Mouse", 500, "Wireless mouse", "mouse.jpg", 50);
@@ -40,7 +39,7 @@ class ProductCatalog {
         count = 5;
     }
 
-    // List all products
+
     static void listAllProducts() {
         System.out.println("\n===== PRODUCT CATALOG =====");
         for (int i = 0; i < count; i++) {
@@ -48,7 +47,7 @@ class ProductCatalog {
         }
     }
 
-    // Get single product by ID
+
     static Product getProductById(int id) {
         for (int i = 0; i < count; i++) {
             if (products[i].id == id) {
@@ -58,7 +57,7 @@ class ProductCatalog {
         return null;
     }
 
-    // Simple search by name
+ 
     static void searchProduct(String keyword) {
         System.out.println("\nSearch results for: " + keyword);
         boolean found = false;
