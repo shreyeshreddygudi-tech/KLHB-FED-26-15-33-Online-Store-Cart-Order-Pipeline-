@@ -3,39 +3,39 @@ import java.util.Date;
 import java.util.Random;
 
 class Utility {
-    // Format price with currency
+   
     static String formatPrice(double price) {
         return "Rs." + String.format("%.2f", price);
     }
 
-    // Generate unique ID
+
     static String generateUniqueId(String prefix) {
         Random rand = new Random();
         int num = 10000 + rand.nextInt(90000);
         return prefix + num;
     }
 
-    // Date/time helper
+ 
     static String getCurrentDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         return sdf.format(new Date());
     }
 
-    // Calculate simple tax (5%)
+
     static double calculateTax(double amount) {
         return amount * 0.05;
     }
 
-    // Calculate fixed shipping
+ 
     static double calculateShipping(double amount) {
         if (amount >= 1000) {
-            return 0;          // free shipping
+            return 0;         
         } else {
-            return 50;         // fixed shipping
+            return 50;       
         }
     }
 
-    // Final total with tax + shipping
+  
     static double calculateFinalTotal(double subtotal) {
         double tax = calculateTax(subtotal);
         double shipping = calculateShipping(subtotal);
