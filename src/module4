@@ -52,4 +52,5 @@ class UserSession {
     boolean isGuest() { return current == null || current instanceof Guest; }
     String currentName() { return current == null ? "Guest" : current.username; }
     void show() { System.out.println(current == null ? "No active session." : "Current user: " + current); }
+
 }
