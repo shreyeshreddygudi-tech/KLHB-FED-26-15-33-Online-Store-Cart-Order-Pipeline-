@@ -17,6 +17,7 @@ class OrderConfirmation {
         return p.substring(0, 3) + "*****" + p.substring(p.length() - 2);
     }
 
+
     void generate(Order o, String paymentStatus) {
         String line = "#".repeat(40);
         System.out.println("\n" + line + "\n       ORDER CONFIRMATION\n" + line);
