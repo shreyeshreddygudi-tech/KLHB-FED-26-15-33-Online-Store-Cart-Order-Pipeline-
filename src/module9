@@ -1,68 +1,35 @@
 class DataStorage {
+    private final List<String> orderData = new ArrayList<>();
+    private static final int LIMIT = 50;
 
-    static String[] productData = new String[50];
-    static int productCount = 0;
+    void saveOrder(String data) {
+        if (orderData.size() >= LIMIT) { System.out.println("Order storage is full!"); return; }
+        orderData.add(data);
+    }
 
-    static String[] orderData = new String[50];
-    static int orderCount = 0;
-
-    static void saveProduct(String data) {
-        if (productCount < productData.length) {
-            productData[productCount] = data;
-            productCount++;
-            System.out.println("Product saved in memory.");
-        } else {
-            System.out.println("Product storage is full!");
+    void saveToFile(String filename, String content) throws StorageException {
+        try (PrintWriter out = new PrintWriter(new FileWriter(filename, true))) {   // true = append
+            out.println(content);
+            System.out.println("Saved to file: " + filename);
+        } catch (IOException e) {
+            throw new StorageException("Could not write " + filename, e);
         }
     }
 
-    static void loadProducts() {
-        System.out.println("\n===== Loaded Products =====");
-        if (productCount == 0) {
-            System.out.println("No products found.");
-        } else {
-            for (int i = 0; i < productCount; i++) {
-                System.out.println(productData[i]);
-            }
+    List<String> readFromFile(String filename) throws StorageException {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String l;
+            while ((l = br.readLine()) != null) lines.add(l);
+        } catch (IOException e) {
+            throw new StorageException("Could not read " + filename, e);
         }
+        return lines;
     }
 
-    static void saveOrder(String data) {
-        if (orderCount < orderData.length) {
-            orderData[orderCount] = data;
-            orderCount++;
-            System.out.println("Order saved in memory.");
-        } else {
-            System.out.println("Order storage is full!");
-        }
-    }
-
-    static void loadOrders() {
-        System.out.println("\n===== Loaded Orders =====");
-        if (orderCount == 0) {
-            System.out.println("No orders found.");
-        } else {
-            for (int i = 0; i < orderCount; i++) {
-                System.out.println(orderData[i]);
-            }
-        }
-    }
-
-
-    static void saveToFile(String filename, String content) {
-        System.out.println("[File Simulation] Writing to " + filename + ":");
-        System.out.println(content);
-        System.out.println("Data written successfully (simulated).");
-    }
-
-    public static void main(String[] args) {
-        saveProduct("101,Laptop,45000,10");
-        saveProduct("102,Mouse,500,50");
-        loadProducts();
-
-        saveOrder("ORD123,Rahul,46000,Confirmed");
-        loadOrders();
-
-        saveToFile("orders.txt", "ORD123,Rahul,46000,Confirmed");
+    void showOrders() {
+        System.out.println("\n===== Stored Orders (this session) =====");
+        if (orderData.isEmpty()) System.out.println("No orders found.");
+        for (String s : orderData) System.out.println(s);
     }
 }
