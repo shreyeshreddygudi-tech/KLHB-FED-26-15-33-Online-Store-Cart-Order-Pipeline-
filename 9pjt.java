@@ -1,5 +1,5 @@
 class DataStorage {
-    // In-memory storage using simple arrays (no ArrayList)
+    // In-memory storage using simple arrays  (no ArrayList)
     static String[] productData = new String[50];
     static int productCount = 0;
 
