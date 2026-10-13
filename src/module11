@@ -1,143 +1,34 @@
-import java.util.Scanner;
-
-class Pjt11 {
-
-    private final Scanner sc = new Scanner(System.in);
-    private int cartItemCount = 0;
-
-    public static void main(String[] args) {
-        new Pjt11().run();
-    }
-
-    private void run() {
-        System.out.println("====== Simple Checkout System ======\n");
-
-        String name = promptRequired("Name");
-
-        addItemToCart();
-
-        while (askYesNo("Add another item to cart? (y/n): ")) {
-            addItemToCart();
-        }
-
-        if (!validateCartNotEmpty(cartItemCount)) {
-            System.out.println("Checkout cancelled: nothing to pay for.");
-            sc.close();
-            return;
-        }
-
-        System.out.println("\n--- Payment ---");
-        boolean paymentSuccess = readBoolean("Did the payment succeed? (true/false): ");
-        handlePaymentResult(paymentSuccess);
-
-        if (paymentSuccess) {
-            System.out.println("\nThank you, " + name + "! Your order of "
-                    + cartItemCount + " item(s) is confirmed.");
-        } else {
-            System.out.println("\nSorry, " + name + ". Please retry payment to complete your order.");
-        }
-
-        sc.close();
-    }
-
-    private void addItemToCart() {
-        System.out.println("\n--- Add Item ---");
-        int available = readInt("Enter available stock for this item: ");
-        int requested = readInt("Enter quantity you want: ");
-
-        if (!validateQuantity(requested)) return;
-        if (!validateStock(available, requested)) return;
-
-        cartItemCount += requested;
-        System.out.println("Added " + requested + " item(s) to cart. Cart total: " + cartItemCount);
-    }
-
-    static boolean validateQuantity(int qty) {
-        if (qty <= 0) {
-            System.out.println("Error: Quantity must be greater than 0.");
-            return false;
-        }
-        System.out.println("Success: Quantity " + qty + " is valid.");
-        return true;
-    }
-
-    static boolean validateRequired(String field, String value) {
-        if (value == null || value.trim().isEmpty()) {
-            System.out.println("Error: " + field + " is required.");
-            return false;
-        }
-        System.out.println("Success: " + field + " = \"" + value + "\" is valid.");
-        return true;
-    }
-
-    static boolean validateStock(int available, int requested) {
-        if (available < 0) {
-            System.out.println("Error: Available stock cannot be negative.");
-            return false;
-        }
-        if (requested > available) {
-            System.out.println("Error: Only " + available + " items in stock.");
-            return false;
-        }
-        System.out.println("Success: " + requested + " item(s) available out of " + available + " in stock.");
-        return true;
-    }
-
-    static boolean validateCartNotEmpty(int itemCount) {
-        if (itemCount <= 0) {
-            System.out.println("Error: Cart is empty. Add items first.");
-            return false;
-        }
-        System.out.println("Success: Cart has " + itemCount + " item(s).");
-        return true;
-    }
-
-    static void handlePaymentResult(boolean success) {
-        if (!success) {
-            System.out.println("Error: Payment failed. Please try another method.");
-        } else {
-            System.out.println("Payment successful.");
-        }
-    }
-
-    private String promptRequired(String field) {
-        while (true) {
-            System.out.print("Enter " + field + ": ");
-            String value = sc.nextLine();
-            if (validateRequired(field, value)) return value;
-        }
-    }
-
-    private int readInt(String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String input = sc.nextLine().trim();
-            try {
-                return Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a whole number.");
-            }
-        }
-    }
-
-    private boolean readBoolean(String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String input = sc.nextLine().trim();
-            if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("false")) {
-                return Boolean.parseBoolean(input);
-            }
-            System.out.println("Invalid input. Please enter true or false.");
-        }
-    }
-
-    private boolean askYesNo(String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String input = sc.nextLine().trim();
-            if (input.equalsIgnoreCase("y")) return true;
-            if (input.equalsIgnoreCase("n")) return false;
-            System.out.println("Please enter 'y' or 'n'.");
-        }
+class ValidationException extends Exception {
+    ValidationException(String msg) { super(msg); }
+}
+class ProductNotFoundException extends Exception {
+    ProductNotFoundException(int id) { super("No product found with ID " + id); }
+}
+class OutOfStockException extends Exception {
+    OutOfStockException(String name, int left) { super("Only " + left + " of " + name + " left in stock"); }
+}
+class ItemNotInCartException extends Exception {
+    ItemNotInCartException(int id) { super("Product " + id + " is not in your cart"); }
+}
+class CartFullException extends RuntimeException {
+    CartFullException(int max) { super("Cart is full (max " + max + " different items)"); }
+}
+class AuthException extends Exception {
+    AuthException(String msg) { super(msg); }
+}
+class PaymentFailedException extends Exception {
+    PaymentFailedException(String msg) { super(msg); }
+}
+class InvalidCouponException extends Exception {
+    InvalidCouponException(String code) { super("Coupon '" + code + "' is not valid"); }
+}
+class StorageException extends Exception {
+    StorageException(String msg, Throwable cause) { super(msg, cause); }
+}
+class InvalidDetailsException extends Exception {
+    final List<String> problems;
+    InvalidDetailsException(List<String> problems) {
+        super(problems.size() + " problem(s) found in shipping details");
+        this.problems = problems;
     }
 }
