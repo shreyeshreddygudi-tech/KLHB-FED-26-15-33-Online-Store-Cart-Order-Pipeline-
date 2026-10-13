@@ -30,5 +30,6 @@ class InvalidDetailsException extends Exception {
     InvalidDetailsException(List<String> problems) {
         super(problems.size() + " problem(s) found in shipping details");
         this.problems = problems;
-    }
+  
+}
 }
