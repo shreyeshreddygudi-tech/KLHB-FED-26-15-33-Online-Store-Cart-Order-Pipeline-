@@ -1,112 +1,91 @@
-import java.util.Scanner;
-
 class Product {
-    int id;
-    String name;
-    double price;
-    String description;
-    String image;      
-    int stock;
+    protected int id;
+    protected String name;
+    protected double price;
+    protected String description;
+    protected String image;
+    protected int stock;
+    protected String category;
 
-    Product(int id, String name, double price, String description, String image, int stock) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.description = description;
-        this.image = image;
-        this.stock = stock;
+    Product(int id, String name, double price, String description, String image, int stock, String category) {
+        this.id = id; this.name = name; this.price = price;
+        this.description = description; this.image = image;
+        this.stock = stock; this.category = category;
+    }
+
+    Product(int id, String name, double price, int stock) {
+        this(id, name, price, "No description", name.toLowerCase() + ".jpg", stock, "General");
     }
 
     void display() {
-        System.out.println("ID: " + id + " | " + name + " | Rs." + price +" | Stock: " + stock);
-        System.out.println("Desc: " + description);
-        System.out.println("Image: " + image);
+        System.out.println("ID: " + id + " | " + name + " | " + Utility.formatPrice(price) + " | Stock: " + stock + " | " + category);
+        System.out.println("Desc : " + description);
+        System.out.println("--------------------------------");
+    }
+}
+
+class ElectronicProduct extends Product {
+    int warrantyMonths;
+    ElectronicProduct(int id, String name, double price, String desc, String image, int stock, int warrantyMonths) {
+        super(id, name, price, desc, image, stock, "Electronics");
+        this.warrantyMonths = warrantyMonths;
+    }
+    @Override
+    void display() {
+        System.out.println("ID: " + id + " | " + name + " | " + Utility.formatPrice(price) + " | Stock: " + stock + " | " + category);
+        System.out.println("Desc : " + description + " | Warranty: " + warrantyMonths + " months");
         System.out.println("--------------------------------");
     }
 }
 
 class ProductCatalog {
-    static Product[] products = new Product[5];  // fixed array for basic version
-    static int count = 0;
+    private final List<Product> products = new ArrayList<>();
 
-  
-    static void loadProducts() {
-        products[0] = new Product(101, "Laptop", 45000, "15-inch gaming laptop", "laptop.jpg", 10);
-        products[1] = new Product(102, "Mouse", 500, "Wireless mouse", "mouse.jpg", 50);
-        products[2] = new Product(103, "Keyboard", 1200, "Mechanical keyboard", "keyboard.jpg", 30);
-        products[3] = new Product(104, "Headphones", 2500, "Noise cancelling", "headphones.jpg", 20);
-        products[4] = new Product(105, "USB Drive", 400, "64GB pen drive", "usb.jpg", 100);
-        count = 5;
+    void loadProducts() {
+        products.add(new ElectronicProduct(101, "Laptop", 45000, "15-inch gaming laptop", "laptop.jpg", 10, 24));
+        products.add(new Product(102, "Mouse", 500, "Wireless mouse", "mouse.jpg", 50, "Accessories"));
+        products.add(new Product(103, "Keyboard", 1200, "Mechanical keyboard", "keyboard.jpg", 30, "Accessories"));
+        products.add(new ElectronicProduct(104, "Headphones", 2500, "Noise cancelling", "headphones.jpg", 20, 12));
+        products.add(new Product(105, "USB Drive", 400, "64GB pen drive", "usb.jpg", 100, "Storage"));
+        products.add(new Product(106, "Notebook", 60, 200));
     }
 
+    List<Product> all() { return products; }
 
-    static void listAllProducts() {
+    void listAll() {
         System.out.println("\n===== PRODUCT CATALOG =====");
-        for (int i = 0; i < count; i++) {
-            products[i].display();
-        }
+        for (Product p : products) p.display();
     }
 
-
-    static Product getProductById(int id) {
-        for (int i = 0; i < count; i++) {
-            if (products[i].id == id) {
-                return products[i];
-            }
-        }
-        return null;
+    Product getById(int id) throws ProductNotFoundException {
+        for (Product p : products) if (p.id == id) return p;
+        throw new ProductNotFoundException(id);
     }
 
- 
-    static void searchProduct(String keyword) {
+    void search(String keyword) {
         System.out.println("\nSearch results for: " + keyword);
         boolean found = false;
-        for (int i = 0; i < count; i++) {
-            if (products[i].name.toLowerCase().contains(keyword.toLowerCase())) {
-                products[i].display();
-                found = true;
-            }
+        for (Product p : products) {
+            if (p.name.toLowerCase().contains(keyword.trim().toLowerCase())) { p.display(); found = true; }
         }
-        if (!found) {
-            System.out.println("No product found.");
-        }
+        if (!found) System.out.println("No product found.");
     }
 
-    public static void main(String[] args) {
-        loadProducts();
-        Scanner sc = new Scanner(System.in);
+    void search(double min, double max) {
+        System.out.println("\nProducts between " + Utility.formatPrice(min) + " and " + Utility.formatPrice(max));
+        boolean found = false;
+        for (Product p : products) {
+            if (p.price >= min && p.price <= max) { p.display(); found = true; }
+        }
+        if (!found) System.out.println("Nothing in that range.");
+    }
 
-        while (true) {
-            System.out.println("\n1. List All Products");
-            System.out.println("2. Get Product by ID");
-            System.out.println("3. Search Product");
-            System.out.println("4. Exit");
-            System.out.print("Choice: ");
-            int ch = sc.nextInt();
-            sc.nextLine();
-
-            switch (ch) {
-                case 1:
-                    listAllProducts();
-                    break;
-                case 2:
-                    System.out.print("Enter Product ID: ");
-                    int id = sc.nextInt();
-                    Product p = getProductById(id);
-                    if (p != null) p.display();
-                    else System.out.println("Product not found!");
-                    break;
-                case 3:
-                    System.out.print("Enter keyword: ");
-                    String key = sc.nextLine();
-                    searchProduct(key);
-                    break;
-                case 4:
-                    System.out.println("Exiting Catalog...");
-                    return;
-                default:
-                    System.out.println("Invalid choice!");
-            }
+    void showByCategory() {
+        Map<String, List<String>> groups = new TreeMap<>();
+        for (Product p : products) groups.computeIfAbsent(p.category, k -> new ArrayList<>()).add(p.name);
+        System.out.println("\n===== PRODUCTS BY CATEGORY =====");
+        for (Map.Entry<String, List<String>> e : groups.entrySet()) {
+            System.out.println(e.getKey().toUpperCase() + ": " + String.join(", ", e.getValue()));
         }
     }
 }
