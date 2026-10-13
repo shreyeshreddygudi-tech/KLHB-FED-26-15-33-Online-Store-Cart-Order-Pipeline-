@@ -2,7 +2,7 @@ class DataStorage {
     private final List<String> orderData = new ArrayList<>();
     private static final int LIMIT = 50;
 
-    void saveOrder(String data) {
+   void saveOrder(String data) {
         if (orderData.size() >= LIMIT) { System.out.println("Order storage is full!"); return; }
         orderData.add(data);
     }
