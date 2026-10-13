@@ -17,7 +17,7 @@ class Inventory {
     }
 
     void showStock() {
-        System.out.println("\n===== CURRENT STOCK =====");
+        System.out.println("\n====== CURRENT STOCK =====");
         List<String> low = new ArrayList<>();
         for (Product p : catalog.all()) {
             System.out.println("Product ID: " + p.id + " | " + p.name + " | Stock: " + p.stock);
