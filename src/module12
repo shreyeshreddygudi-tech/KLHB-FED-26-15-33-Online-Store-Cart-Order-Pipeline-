@@ -1,57 +1,40 @@
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-
 class Utility {
-   
-    static String formatPrice(double price) {
-        return "Rs." + String.format("%.2f", price);
+    private static final Random RANDOM = new Random();
+    static final double TAX_RATE = 0.05;
+    static final double FREE_SHIPPING_ABOVE = 1000;
+    static final Map<String, Double> COUPONS = new HashMap<>();
+    static {
+        COUPONS.put("SAVE10", 0.10);
+        COUPONS.put("FEST20", 0.20);
+        COUPONS.put("NEW5", 0.05);
     }
 
+    static String formatPrice(double p) { return "Rs." + String.format("%.2f", p); }
+    static String formatPrice(double p, String symbol) { return symbol + String.format("%.2f", p); }
+    static String generateUniqueId(String prefix) { return prefix.toUpperCase() + (10000 + RANDOM.nextInt(90000)); }
+    static String getCurrentDateTime() { return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()); }
+    static double calculateTax(double amount) { return amount * TAX_RATE; }
+    static double calculateShipping(double amount) { return amount >= FREE_SHIPPING_ABOVE ? 0 : 50; }
+    static double calculateShipping(double amount, boolean express) { return calculateShipping(amount) + (express ? 100 : 0); }
 
-    static String generateUniqueId(String prefix) {
-        Random rand = new Random();
-        int num = 10000 + rand.nextInt(90000);
-        return prefix + num;
+    static double applyCoupon(double amount, String code) throws InvalidCouponException {
+        Double rate = COUPONS.get(code == null ? "" : code.trim().toUpperCase());
+        if (rate == null) throw new InvalidCouponException(code);
+        return amount * rate;
     }
 
- 
-    static String getCurrentDateTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        return sdf.format(new Date());
+    // Combining: buy more different things, save a little more
+    static double bundleDiscount(int differentItems, double amount) {
+        if (differentItems >= 3) return amount * 0.05;
+        if (differentItems == 2) return amount * 0.02;
+        return 0;
     }
 
-
-    static double calculateTax(double amount) {
-        return amount * 0.05;
-    }
-
- 
-    static double calculateShipping(double amount) {
-        if (amount >= 1000) {
-            return 0;         
-        } else {
-            return 50;       
-        }
-    }
-
-  
     static double calculateFinalTotal(double subtotal) {
-        double tax = calculateTax(subtotal);
-        double shipping = calculateShipping(subtotal);
-        return subtotal + tax + shipping;
+        return subtotal + calculateTax(subtotal) + calculateShipping(subtotal);
     }
-
-    public static void main(String[] args) {
-        System.out.println("Formatted Price : " + formatPrice(45999.5));
-        System.out.println("Order ID        : " + generateUniqueId("ORD"));
-        System.out.println("Product ID      : " + generateUniqueId("PRD"));
-        System.out.println("Current Time    : " + getCurrentDateTime());
-
-        double subtotal = 46000;
-        System.out.println("Subtotal        : " + formatPrice(subtotal));
-        System.out.println("Tax (5%)        : " + formatPrice(calculateTax(subtotal)));
-        System.out.println("Shipping        : " + formatPrice(calculateShipping(subtotal)));
-        System.out.println("Final Total     : " + formatPrice(calculateFinalTotal(subtotal)));
+    static double calculateFinalTotal(double subtotal, double discount, boolean express) {
+        double net = subtotal - discount;
+        return net + calculateTax(net) + calculateShipping(net, express);
     }
 }
