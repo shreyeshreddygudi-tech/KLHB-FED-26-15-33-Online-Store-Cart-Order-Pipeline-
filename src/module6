@@ -42,7 +42,7 @@ class Order {
         System.out.println("Items:");
         for (OrderItem i : items) System.out.println("  - " + i);
         System.out.println("TOTAL PAID : " + Utility.formatPrice(total));
-        System.out.println("=========================");
+        System.out.println("==========================");
     }
 
     @Override public String toString() { return orderId + " | " + customerName + " | " + Utility.formatPrice(total) + " | " + status; }
