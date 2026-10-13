@@ -1,52 +1,28 @@
 class Inventory {
-    static int[] productIds = {101, 102, 103, 104, 105};
-    static int[] stock = {10, 50, 30, 20, 100};
+    private final ProductCatalog catalog;
+    private static final int LOW_STOCK_LIMIT = 15;
 
+    Inventory(ProductCatalog catalog) { this.catalog = catalog; }
 
-    static boolean checkStock(int productId, int qty) {
-        for (int i = 0; i < productIds.length; i++) {
-            if (productIds[i] == productId) {
-                if (stock[i] >= qty) {
-                    return true;
-                } else {
-                    System.out.println("Only " + stock[i] + " left in stock!");
-                    return false;
-                }
-            }
-        }
-        System.out.println("Product not found in inventory.");
-        return false;
+    void checkStock(int productId, int qty) throws OutOfStockException, ProductNotFoundException {
+        Product p = catalog.getById(productId);
+        if (p.stock < qty) throw new OutOfStockException(p.name, p.stock);
     }
 
-    static void decreaseStock(int productId, int qty) {
-        for (int i = 0; i < productIds.length; i++) {
-            if (productIds[i] == productId) {
-                if (stock[i] >= qty) {
-                    stock[i] -= qty;
-                    System.out.println("Stock updated. Remaining: " + stock[i]);
-                } else {
-                    System.out.println("Cannot decrease. Insufficient stock.");
-                }
-                return;
-            }
-        }
+    void decreaseStock(int productId, int qty) throws OutOfStockException, ProductNotFoundException {
+        checkStock(productId, qty);
+        Product p = catalog.getById(productId);
+        p.stock -= qty;
+        System.out.println("Stock updated for " + p.name + ". Remaining: " + p.stock);
     }
 
-    static void showStock() {
+    void showStock() {
         System.out.println("\n===== CURRENT STOCK =====");
-        for (int i = 0; i < productIds.length; i++) {
-            System.out.println("Product ID: " + productIds[i] + " | Stock: " + stock[i]);
+        List<String> low = new ArrayList<>();
+        for (Product p : catalog.all()) {
+            System.out.println("Product ID: " + p.id + " | " + p.name + " | Stock: " + p.stock);
+            if (p.stock <= LOW_STOCK_LIMIT) low.add(p.name);
         }
-    }
-
-    public static void main(String[] args) {
-        showStock();
-
-        if (checkStock(101, 2)) {
-            System.out.println("Stock available. Proceeding...");
-            decreaseStock(101, 2);
-        }
-
-        showStock();
+        System.out.println("Low stock (<= " + LOW_STOCK_LIMIT + "): " + (low.isEmpty() ? "none" : String.join(", ", low)));
     }
 }
