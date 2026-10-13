@@ -34,7 +34,7 @@ class ElectronicProduct extends Product {
     void display() {
         System.out.println("ID: " + id + " | " + name + " | " + Utility.formatPrice(price) + " | Stock: " + stock + " | " + category);
         System.out.println("Desc : " + description + " | Warranty: " + warrantyMonths + " months");
-        System.out.println("--------------------------------");
+        System.out.println("-------------------------------");
     }
 }
 
