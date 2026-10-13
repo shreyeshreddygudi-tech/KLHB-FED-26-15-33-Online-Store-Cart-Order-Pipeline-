@@ -1,90 +1,71 @@
-import java.util.Date;
-import java.util.Random;
+enum OrderStatus { PENDING, CONFIRMED, PAYMENT_PENDING, SHIPPED, DELIVERED, CANCELLED }
 
 class OrderItem {
-    int productId;
-    String name;
-    double price;
-    int quantity;
-
+    int productId; String name; double price; int quantity;
     OrderItem(int productId, String name, double price, int quantity) {
-        this.productId = productId;
-        this.name = name;
-        this.price = price;
-        this.quantity = quantity;
+        this.productId = productId; this.name = name; this.price = price; this.quantity = quantity;
     }
+    @Override public String toString() { return name + " x" + quantity + " = " + Utility.formatPrice(price * quantity); }
 }
 
 class Order {
-    String orderId;
-    OrderItem[] items;
-    int itemCount;
+    String orderId, customerName, address, phone;
+    List<OrderItem> items = new ArrayList<>();
     double total;
-    String status;
-    Date timestamp;
-    String customerName;
-    String address;
+    OrderStatus status = OrderStatus.PENDING;
+    Date timestamp = new Date();
 
-    Order(String customerName, String address) {
-        this.orderId = generateOrderId();
-        this.items = new OrderItem[20];
-        this.itemCount = 0;
-        this.total = 0;
-        this.status = "Pending";
-        this.timestamp = new Date();
+    Order(String customerName, String address, String phone) {
+        this.orderId = Utility.generateUniqueId("ORD");
         this.customerName = customerName;
         this.address = address;
+        this.phone = phone;
     }
 
+    void addItem(int pid, String name, double price, int qty) { items.add(new OrderItem(pid, name, price, qty)); }
+    void addItem(OrderItem i) { items.add(i); }
 
-    static String generateOrderId() {
-        Random rand = new Random();
-        int num = 10000 + rand.nextInt(90000);
-        return "ORD" + num;
+    void updateStatus(OrderStatus next) {
+        if (status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED)
+            throw new IllegalStateException("Order " + orderId + " is already " + status);
+        status = next;
     }
 
-    void addItem(int pid, String name, double price, int qty) {
-        items[itemCount] = new OrderItem(pid, name, price, qty);
-        total += price * qty;
-        itemCount++;
-    }
-
-    void displayOrder() {
+    void display() {
         System.out.println("\n===== ORDER DETAILS =====");
         System.out.println("Order ID   : " + orderId);
         System.out.println("Customer   : " + customerName);
         System.out.println("Address    : " + address);
-        System.out.println("Status     : " + status);
-        System.out.println("Date       : " + timestamp);
+        System.out.println("Phone      : " + OrderConfirmation.mask(phone));
+        System.out.println("Status     : " + status.toString().replace('_', ' '));
+        System.out.println("Date       : " + new SimpleDateFormat("dd-MM-yyyy HH:mm").format(timestamp));
         System.out.println("Items:");
-        for (int i = 0; i < itemCount; i++) {
-            System.out.println("  - " + items[i].name + " x" + items[i].quantity +
-                               " = Rs." + (items[i].price * items[i].quantity));
-        }
-        System.out.println("TOTAL      : Rs." + total);
+        for (OrderItem i : items) System.out.println("  - " + i);
+        System.out.println("TOTAL PAID : " + Utility.formatPrice(total));
         System.out.println("=========================");
     }
+
+    @Override public String toString() { return orderId + " | " + customerName + " | " + Utility.formatPrice(total) + " | " + status; }
 }
 
-class OrderModule {
-    static Order[] orders = new Order[50];
-    static int orderCount = 0;
+class OrderBook {
+    private static final int MAX_ORDERS = 50;
+    private final List<Order> orders = new ArrayList<>();
 
-    static void saveOrder(Order o) {
-        if (orderCount < orders.length) {
-            orders[orderCount] = o;
-            orderCount++;
-            System.out.println("Order saved successfully! ID: " + o.orderId);
-        }
+    void save(Order o) {
+        if (orders.size() >= MAX_ORDERS) throw new IllegalStateException("Order book is full");
+        orders.add(o);
+        System.out.println("Order saved successfully! ID: " + o.orderId);
     }
 
-    public static void main(String[] args) {
-        Order o = new Order("Rahul Sharma", "123 MG Road, Bangalore");
-        o.addItem(101, "Laptop", 45000, 1);
-        o.addItem(102, "Mouse", 500, 2);
-        o.status = "Confirmed";
-
-        o.displayOrder();
-        saveOrder(o);
+    void showHistory() {
+        if (orders.isEmpty()) { System.out.println("No orders placed yet."); return; }
+        Map<OrderStatus, List<Order>> groups = new EnumMap<>(OrderStatus.class);
+        for (Order o : orders) groups.computeIfAbsent(o.status, k -> new ArrayList<>()).add(o);
+        System.out.println("\n===== ORDER HISTORY (grouped by status) =====");
+        for (Map.Entry<OrderStatus, List<Order>> e : groups.entrySet()) {
+            System.out.println(e.getKey() + " (" + e.getValue().size() + ")");
+            for (Order o : e.getValue()) System.out.println("   " + o);
+        }
     }
 }
