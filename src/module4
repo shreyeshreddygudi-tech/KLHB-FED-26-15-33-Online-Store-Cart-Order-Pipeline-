@@ -1,107 +1,55 @@
-import java.util.Scanner;
+abstract class User {
+    protected String username, password;
+    User(String username, String password) { this.username = username; this.password = password; }
+    abstract String getRole();
+    boolean matches(String u, String p) { return username.equals(u) && password.equals(p); }
+    @Override public String toString() { return username + " (" + getRole() + ")"; }
+}
 
-class User {
-    String username;
-    String password;
+class Customer extends User {
+    Customer(String u, String p) { super(u, p); }
+    @Override String getRole() { return "Customer"; }
+}
 
-    User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+class Guest extends User {
+    Guest() { super("Guest", ""); }
+    @Override String getRole() { return "Guest"; }
 }
 
 class UserSession {
-    static User[] users = new User[10];
-    static int userCount = 0;
-    static String currentUser = null;
+    private static final int MAX_USERS = 10;
+    private final List<User> users = new ArrayList<>();
+    private User current = null;
 
-    static void register(String uname, String pass) {
-        if (userCount < users.length) {
-            users[userCount] = new User(uname, pass);
-            userCount++;
-            System.out.println("Registration successful!");
-        } else {
-            System.out.println("User limit reached.");
-        }
+    void register(String uname, String pass) throws AuthException {
+        uname = uname.trim();
+        if (uname.isEmpty()) throw new AuthException("Username cannot be empty");
+        if (uname.contains(" ")) throw new AuthException("Username cannot contain spaces");
+        if (pass.length() < 4) throw new AuthException("Password must be at least 4 characters");
+        if (users.size() >= MAX_USERS) throw new AuthException("User limit reached");
+        for (User u : users) if (u.username.equalsIgnoreCase(uname)) throw new AuthException("Username already taken");
+        users.add(new Customer(uname, pass));
+        System.out.println("Registration successful! Welcome, " + uname);
     }
 
-
-    static boolean login(String uname, String pass) {
-        for (int i = 0; i < userCount; i++) {
-            if (users[i].username.equals(uname) && users[i].password.equals(pass)) {
-                currentUser = uname;
-                System.out.println("Login successful. Welcome " + uname);
-                return true;
+    void login(String uname, String pass) throws AuthException {
+        for (User u : users) {
+            if (u.matches(uname.trim(), pass)) {
+                current = u;
+                System.out.println("Login successful. Welcome " + u);
+                return;
             }
         }
-        System.out.println("Invalid username or password.");
-        return false;
+        throw new AuthException("Invalid username or password");
     }
 
-
-    static void guestLogin() {
-        currentUser = "Guest";
-        System.out.println("Continuing as Guest.");
+    void guestLogin() { current = new Guest(); }
+    void logout() {
+        System.out.println(current == null ? "Nobody is logged in." : "Logged out " + current.username);
+        current = null;
+        guestLogin();
     }
-
- 
-    static void logout() {
-        currentUser = null;
-        System.out.println("Logged out.");
-    }
-
-
-    static void showSession() {
-        if (currentUser == null) {
-            System.out.println("No active session.");
-        } else {
-            System.out.println("Current user: " + currentUser);
-        }
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        while (true) {
-            System.out.println("\n1. Register");
-            System.out.println("2. Login");
-            System.out.println("3. Guest Checkout");
-            System.out.println("4. Show Session");
-            System.out.println("5. Logout");
-            System.out.println("6. Exit");
-            System.out.print("Choice: ");
-            int ch = sc.nextInt();
-            sc.nextLine();
-
-            switch (ch) {
-                case 1:
-                    System.out.print("Username: ");
-                    String u = sc.nextLine();
-                    System.out.print("Password: ");
-                    String p = sc.nextLine();
-                    register(u, p);
-                    break;
-                case 2:
-                    System.out.print("Username: ");
-                    String lu = sc.nextLine();
-                    System.out.print("Password: ");
-                    String lp = sc.nextLine();
-                    login(lu, lp);
-                    break;
-                case 3:
-                    guestLogin();
-                    break;
-                case 4:
-                    showSession();
-                    break;
-                case 5:
-                    logout();
-                    break;
-                case 6:
-                    return;
-                default:
-                    System.out.println("Invalid!");
-            }
-        }
-    }
+    boolean isGuest() { return current == null || current instanceof Guest; }
+    String currentName() { return current == null ? "Guest" : current.username; }
+    void show() { System.out.println(current == null ? "No active session." : "Current user: " + current); }
 }
