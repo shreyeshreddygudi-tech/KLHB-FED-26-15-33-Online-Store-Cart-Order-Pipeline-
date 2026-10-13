@@ -7,7 +7,7 @@ class UI {
     }
 
     static void menu(String user) {
-        System.out.println("\n================ MAIN MENU ================  (user: " + user + ")");
+        System.out.println("\n=============== MAIN MENU ================  (user: " + user + ")");
         System.out.println(" 1. Browse Products          9. Register");
         System.out.println(" 2. Search by Name          10. Login");
         System.out.println(" 3. Search by Price Range   11. Logout");
