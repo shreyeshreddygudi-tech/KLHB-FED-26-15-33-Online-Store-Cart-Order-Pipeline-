@@ -72,6 +72,6 @@ class ShoppingCart {
         int i = 1;
         for (CartItem c : items) System.out.println((i++) + ". " + c);
         System.out.println("TOTAL: " + Utility.formatPrice(calculateTotal()));
-        System.out.println("=====================");
+        System.out.println("====================");
     }
 }
