@@ -49,6 +49,7 @@ class PaymentGateway {
         return METHODS.get(1);
     }
 
+
     static boolean process(PaymentMethod m, double amount) {
         try {
             boolean ok = m.pay(amount);
