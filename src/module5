@@ -1,76 +1,39 @@
-import java.util.Scanner;
-
 class Checkout {
-    static String name;
-    static String address;
-    static String phone;
-    static String city;
-    static String pincode;
+    String name, address, phone, city, pincode;
 
- 
-    static void collectDetails() {
-        Scanner sc = new Scanner(System.in);
+    void collectDetails(Scanner sc, String defaultName) {
         System.out.println("\n===== CHECKOUT - Shipping Details =====");
-
-        System.out.print("Full Name: ");
-        name = sc.nextLine();
-
-        System.out.print("Address: ");
-        address = sc.nextLine();
-
-        System.out.print("Phone: ");
-        phone = sc.nextLine();
-
-
-        System.out.print("City: ");
-        city = sc.nextLine();
-
-        System.out.print("Pincode: ");
-        pincode = sc.nextLine();
+        System.out.print("Full Name" + (defaultName.equals("Guest") ? "" : " [" + defaultName + "]") + ": ");
+        name = sc.nextLine().trim();
+        if (name.isEmpty() && !defaultName.equals("Guest")) name = defaultName;
+        System.out.print("Address: ");       address = sc.nextLine().trim();
+        System.out.print("Mobile Number: "); phone = sc.nextLine().trim();
+        System.out.print("City: ");          city = sc.nextLine().trim();
+        System.out.print("Pincode: ");       pincode = sc.nextLine().trim();
     }
 
-
-    static boolean validate() {
-        if (name == null || name.trim().isEmpty()) {
-            System.out.println("Name is required!");
-            return false;
-        }
-        if (address == null || address.trim().isEmpty()) {
-            System.out.println("Address is required!");
-            return false;
-        }
-        if (phone == null || phone.length() < 10) {
-            System.out.println("Valid phone number required!");
-            return false;
-        }
-        if (city == null || city.trim().isEmpty()) {
-            System.out.println("City is required!");
-            return false;
-        }
-        if (pincode == null || pincode.length() != 6) {
-            System.out.println("Valid 6-digit pincode required!");
-            return false;
-        }
-        return true;
+    void validate() throws InvalidDetailsException {
+        List<String> errors = new ArrayList<>();
+        if (name == null || name.isEmpty()) errors.add("Name is required");
+        else if (!name.matches("[A-Za-z .]+")) errors.add("Name should contain letters only");
+        if (address == null || address.isEmpty()) errors.add("Address is required");
+        if (phone == null || !phone.matches("\\d{10}")) errors.add("Mobile must be exactly 10 digits");
+        if (city == null || city.isEmpty()) errors.add("City is required");
+        if (pincode == null || !pincode.matches("\\d{6}")) errors.add("Pincode must be exactly 6 digits");
+        if (!errors.isEmpty()) throw new InvalidDetailsException(errors);
     }
 
- 
-    static void reviewOrder(double total) {
+    void reviewOrder(double total) {
         System.out.println("\n===== ORDER SUMMARY =====");
-        System.out.println("Customer : " + name);
+        System.out.println("Customer : " + name.toUpperCase());
         System.out.println("Address  : " + address + ", " + city + " - " + pincode);
-        System.out.println("Phone    : " + phone);
-        System.out.println("Total    : Rs." + total);
+        System.out.println("Phone    : " + OrderConfirmation.mask(phone));
+        System.out.println("Total    : " + Utility.formatPrice(total));
         System.out.println("=========================");
     }
 
-    public static void main(String[] args) {
-        collectDetails();
-        if (validate()) {
-            reviewOrder(45500);  
-            System.out.println("Details validated. Ready for payment.");
-        } else {
-            System.out.println("Please correct the errors.");
-        }
+    void reviewOrder(double total, String note) {
+        reviewOrder(total);
+        System.out.println("Note     : " + note);
     }
 }
