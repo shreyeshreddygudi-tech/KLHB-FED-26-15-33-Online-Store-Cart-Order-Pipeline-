@@ -1,24 +1,35 @@
-class OrderConfirmation {
-    static void generateConfirmation(String orderId, String customerName, double total, String paymentStatus) {
-        System.out.println("\n########################################");
-        System.out.println("       ORDER CONFIRMATION");
-        System.out.println("########################################");
-        System.out.println("Dear " + customerName + ",");
-        System.out.println();
-        System.out.println("Your order has been placed successfully!");
-        System.out.println();
-        System.out.println("Order ID       : " + orderId);
-        System.out.println("Total Amount   : Rs." + total);
-        System.out.println("Payment Status : " + paymentStatus);
-        System.out.println();
-        System.out.println("Thank you for shopping with us!");
-        System.out.println("You will receive updates on your registered mobile.");
-        System.out.println("934*****89");
+interface Notifier { void send(String to, String message); }
 
-        System.out.println("\n[Email Simulation] Confirmation mail sent to customer@email.com");
+class EmailNotifier implements Notifier {
+    @Override public void send(String to, String msg) { System.out.println("[Email -> " + to + "] " + msg); }
+}
+
+class SmsNotifier implements Notifier {
+    @Override public void send(String to, String msg) { System.out.println("[SMS -> " + OrderConfirmation.mask(to) + "] " + msg); }
+}
+
+class OrderConfirmation {
+    private final List<Notifier> notifiers = new ArrayList<>(List.of(new EmailNotifier(), new SmsNotifier()));
+
+    static String mask(String phone) {
+        if (phone == null || phone.trim().length() < 6) return "**********";
+        String p = phone.trim();
+        return p.substring(0, 3) + "*****" + p.substring(p.length() - 2);
     }
 
-    public static void main(String[] args) {
-        generateConfirmation("ORD45821", "Rahul Sharma", 46000, "SUCCESS");
+    void generate(Order o, String paymentStatus) {
+        String line = "#".repeat(40);
+        System.out.println("\n" + line + "\n       ORDER CONFIRMATION\n" + line);
+        System.out.println("Dear " + o.customerName + ",\n");
+        System.out.println(paymentStatus.equals("SUCCESS")
+                ? "Your order has been placed successfully!"
+                : "Your order is saved, but payment is still pending.");
+        System.out.println("\nOrder ID       : " + o.orderId);
+        System.out.println("Total Amount   : " + Utility.formatPrice(o.total));
+        System.out.println("Payment Status : " + paymentStatus);
+        System.out.println("\nThank you for shopping with us!");
+        String msg = "Order " + o.orderId + " (" + paymentStatus + ") for " + Utility.formatPrice(o.total);
+        notifiers.get(0).send("customer@email.com", msg);
+        notifiers.get(1).send(o.phone, msg);
     }
 }
