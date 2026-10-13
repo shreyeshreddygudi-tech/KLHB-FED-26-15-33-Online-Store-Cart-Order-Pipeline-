@@ -29,7 +29,7 @@ class Checkout {
         System.out.println("Address  : " + address + ", " + city + " - " + pincode);
         System.out.println("Phone    : " + OrderConfirmation.mask(phone));
         System.out.println("Total    : " + Utility.formatPrice(total));
-        System.out.println("=========================");
+        System.out.println("==========================");
     }
 
     void reviewOrder(double total, String note) {
