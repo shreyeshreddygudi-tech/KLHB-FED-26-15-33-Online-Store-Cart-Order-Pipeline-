@@ -1,161 +1,77 @@
-import java.util.Scanner;
-
 class CartItem {
-    int productId;
-    String name;
-    double price;
-    int quantity;
+    int productId; String name; double price; int quantity;
 
     CartItem(int productId, String name, double price, int quantity) {
-        this.productId = productId;
-        this.name = name;
-        this.price = price;
-        this.quantity = quantity;
+        this.productId = productId; this.name = name; this.price = price; this.quantity = quantity;
     }
+    double getSubtotal() { return price * quantity; }
 
-    double getSubtotal() {
-        return price * quantity;
+    @Override
+    public String toString() {
+        return String.format("%-12s Qty: %-3d Price: Rs.%-9.2f Subtotal: Rs.%.2f", name, quantity, price, getSubtotal());
     }
 }
 
 class ShoppingCart {
-    static CartItem[] cart = new CartItem[20];  // max 20 items
-    static int itemCount = 0;
+    private static final int MAX_ITEMS = 20;
+    private final List<CartItem> items = new ArrayList<>();
 
+    List<CartItem> getItems() { return items; }
+    int distinctItems() { return items.size(); }
+    boolean isEmpty() { return items.isEmpty(); }
 
-    static void addItem(int productId, String name, double price, int qty) {
-
-        for (int i = 0; i < itemCount; i++) {
-            if (cart[i].productId == productId) {
-                cart[i].quantity += qty;
-                System.out.println("Quantity updated for " + name);
-                return;
-            }
-        }
-
-        if (itemCount < cart.length) {
-            cart[itemCount] = new CartItem(productId, name, price, qty);
-            itemCount++;
-            System.out.println(name + " added to cart.");
-        } else {
-            System.out.println("Cart is full!");
-        }
+    private CartItem find(int id) {
+        for (CartItem c : items) if (c.productId == id) return c;
+        return null;
     }
 
-
-    static void removeItem(int productId) {
-        for (int i = 0; i < itemCount; i++) {
-            if (cart[i].productId == productId) {
-                for (int j = i; j < itemCount - 1; j++) {
-                    cart[j] = cart[j + 1];
-                }
-                itemCount--;
-                System.out.println("Item removed from cart.");
-                return;
-            }
-        }
-        System.out.println("Item not found in cart.");
-    }
-
-    static void updateQuantity(int productId, int newQty) {
-        for (int i = 0; i < itemCount; i++) {
-            if (cart[i].productId == productId) {
-                if (newQty <= 0) {
-                    removeItem(productId);
-                } else {
-                    cart[i].quantity = newQty;
-                    System.out.println("Quantity updated.");
-                }
-                return;
-            }
-        }
-        System.out.println("Item not found.");
-    }
-
- 
-    static double calculateTotal() {
-        double total = 0;
-        for (int i = 0; i < itemCount; i++) {
-            total += cart[i].getSubtotal();
-        }
-        return total;
-    }
-
-    
-    static void clearCart() {
-        itemCount = 0;
-        System.out.println("Cart cleared.");
-    }
-
-    
-    static void displayCart() {
-        if (itemCount == 0) {
-            System.out.println("Cart is empty.");
+    void addItem(int productId, String name, double price, int qty) {
+        CartItem existing = find(productId);
+        if (existing != null) {
+            existing.quantity += qty;
+            System.out.println("Quantity updated for " + name);
             return;
         }
-        System.out.println("\n===== YOUR CART =====");
-        for (int i = 0; i < itemCount; i++) {
-            System.out.println((i + 1) + ". " + cart[i].name +
-                               " | Qty: " + cart[i].quantity +
-                               " | Price: Rs." + cart[i].price +
-                               " | Subtotal: Rs." + cart[i].getSubtotal());
-        }
-        System.out.println("TOTAL: Rs." + calculateTotal());
-        System.out.println("=====================");
+        if (items.size() >= MAX_ITEMS) throw new CartFullException(MAX_ITEMS);
+        items.add(new CartItem(productId, name, price, qty));
+        System.out.println(name + " added to cart.");
     }
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    void addItem(Product p, int qty) { addItem(p.id, p.name, p.price, qty); }
 
-        // Sample adds
-        addItem(101, "Laptop", 45000, 1);
-        addItem(102, "Mouse", 500, 2);
+    int quantityOf(int productId) {
+        CartItem c = find(productId);
+        return c == null ? 0 : c.quantity;
+    }
 
-        while (true) {
-            System.out.println("\n1. View Cart");
-            System.out.println("2. Add Item");
-            System.out.println("3. Remove Item");
-            System.out.println("4. Update Quantity");
-            System.out.println("5. Clear Cart");
-            System.out.println("6. Exit");
-            System.out.print("Choice: ");
-            int ch = sc.nextInt();
+    void removeItem(int productId) throws ItemNotInCartException {
+        CartItem c = find(productId);
+        if (c == null) throw new ItemNotInCartException(productId);
+        items.remove(c);
+        System.out.println(c.name + " removed from cart.");
+    }
 
-            switch (ch) {
-                case 1:
-                    displayCart();
-                    break;
-                case 2:
-                    System.out.print("Product ID: ");
-                    int id = sc.nextInt();
-                    sc.nextLine();
-                    System.out.print("Name: ");
-                    String name = sc.nextLine();
-                    System.out.print("Price: ");
-                    double price = sc.nextDouble();
-                    System.out.print("Qty: ");
-                    int qty = sc.nextInt();
-                    addItem(id, name, price, qty);
-                    break;
-                case 3:
-                    System.out.print("Enter Product ID to remove: ");
-                    removeItem(sc.nextInt());
-                    break;
-                case 4:
-                    System.out.print("Product ID: ");
-                    int pid = sc.nextInt();
-                    System.out.print("New Qty: ");
-                    int nq = sc.nextInt();
-                    updateQuantity(pid, nq);
-                    break;
-                case 5:
-                    clearCart();
-                    break;
-                case 6:
-                    return;
-                default:
-                    System.out.println("Invalid!");
-            }
-        }
+    void updateQuantity(int productId, int newQty) throws ItemNotInCartException {
+        CartItem c = find(productId);
+        if (c == null) throw new ItemNotInCartException(productId);
+        if (newQty <= 0) removeItem(productId);
+        else { c.quantity = newQty; System.out.println("Quantity updated."); }
+    }
+
+    double calculateTotal() {
+        double t = 0;
+        for (CartItem c : items) t += c.getSubtotal();
+        return t;
+    }
+
+    void clear() { items.clear(); System.out.println("Cart cleared."); }
+
+    void display() {
+        if (items.isEmpty()) { System.out.println("Cart is empty."); return; }
+        System.out.println("\n===== YOUR CART =====");
+        int i = 1;
+        for (CartItem c : items) System.out.println((i++) + ". " + c);
+        System.out.println("TOTAL: " + Utility.formatPrice(calculateTotal()));
+        System.out.println("=====================");
     }
 }
