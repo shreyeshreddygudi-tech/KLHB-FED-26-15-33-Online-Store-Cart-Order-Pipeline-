@@ -10,7 +10,7 @@ class FrontendUI {
         System.out.println("3. Keyboard   - Rs.1200");
         System.out.println("4. Headphones - Rs.2500");
         System.out.println("5. USB Drive  - Rs.400");
-        System.out.println("=====================================");
+        System.out.println("====================================");
     }
 
     static void productDetailPage(int choice) {
