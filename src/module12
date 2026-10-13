@@ -23,7 +23,7 @@ class Utility {
         return amount * rate;
     }
 
-    // Combining: buy more different things, save a little more
+    // Combining: buy more different things, save a little  more
     static double bundleDiscount(int differentItems, double amount) {
         if (differentItems >= 3) return amount * 0.05;
         if (differentItems == 2) return amount * 0.02;
